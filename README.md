@@ -44,6 +44,16 @@ and registers the resulting minion with Velocity.
 Every minigame implements `NexusGame` and annotates itself with `@GameMeta`.
 Nexus never touches game logic - it only calls lifecycle hooks.
 
+Game plugins only need `nexus-api` in their `libs/` folder — no compile-time dependency
+on `nexus-hub`. Register in your plugin's `onEnable`:
+
+```java
+// In your game plugin's onEnable():
+NexusAPI.registerGame(new BedwarsGame());
+```
+
+nexus-hub picks this up automatically one tick after startup.
+
 ```java
 @GameMeta(
     id = "bedwars",

@@ -12,10 +12,12 @@ import java.util.UUID;
  * their ID, player counts, and resource requirements. Nexus never touches game
  * logic directly — it only calls the lifecycle hooks defined here.
  *
- * <p>Example registration on a game server's Paper plugin:
+ * <p>Example registration in a game plugin's {@code onEnable}:
  * <pre>{@code
- * NexusHubPlugin.getInstance().getGameRegistry().register(new RevenantGame());
+ * NexusAPI.registerGame(new RevenantGame());
  * }</pre>
+ *
+ * <p>Game plugins only need {@code nexus-api} as a compile-time dependency.
  *
  * @since 1.0.0
  */
