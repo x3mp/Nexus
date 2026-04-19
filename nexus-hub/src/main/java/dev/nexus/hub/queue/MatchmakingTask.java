@@ -3,6 +3,7 @@ package dev.nexus.hub.queue;
 import dev.nexus.api.game.GameMeta;
 import dev.nexus.api.game.NexusGame;
 import dev.nexus.api.queue.QueueEntry;
+import dev.nexus.hub.config.NexusConfig;
 import dev.nexus.hub.game.GameRegistry;
 import dev.nexus.hub.minion.MinionManager;
 import dev.nexus.hub.redis.RedisManager;
@@ -12,7 +13,6 @@ import redis.clients.jedis.params.SetParams;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 /**
  * Periodic task that checks all game queues and triggers minion provisioning when a
@@ -31,29 +31,33 @@ public class MatchmakingTask extends BukkitRunnable {
     private final QueueManager queueManager;
     private final MinionManager minionManager;
     private final RedisManager redis;
-    private final Logger logger;
+    private final NexusConfig config;
 
     /**
      * @param gameRegistry   registry of all registered games
      * @param queueManager   Redis-backed queue manager
      * @param minionManager  handles provisioning when a match is ready
      * @param redis          used to acquire the distributed provision lock
-     * @param logger         plugin logger
+     * @param config         hub config; read for the managed-games filter
      */
     public MatchmakingTask(GameRegistry gameRegistry, QueueManager queueManager,
-                           MinionManager minionManager, RedisManager redis, Logger logger) {
+                           MinionManager minionManager, RedisManager redis,
+                           NexusConfig config) {
         this.gameRegistry = gameRegistry;
         this.queueManager = queueManager;
         this.minionManager = minionManager;
         this.redis = redis;
-        this.logger = logger;
+        this.config = config;
     }
 
     @Override
     public void run() {
+        List<String> managed = config.getManagedGames();
         for (NexusGame game : gameRegistry.getAll()) {
             GameMeta meta = game.getClass().getAnnotation(GameMeta.class);
             if (meta == null) continue;
+
+            if (!managed.isEmpty() && !managed.contains(meta.id())) continue;
 
             long queueSize = queueManager.getSize(meta.id());
             if (queueSize < meta.minPlayers()) continue;

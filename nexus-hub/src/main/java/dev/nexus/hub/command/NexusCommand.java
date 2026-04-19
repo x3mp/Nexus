@@ -93,6 +93,10 @@ public class NexusCommand implements CommandExecutor, TabCompleter {
     }
 
     private boolean handleStatus(CommandSender sender) {
+        if (!sender.hasPermission("nexus.status")) {
+            sender.sendMessage("§cNo permission.");
+            return true;
+        }
         List<Minion> minions = minionRegistry.getAll();
         List<Turret> turrets = turretRegistry.getAll();
         long online = turrets.stream().filter(t -> t.getStatus() == TurretStatus.ONLINE).count();

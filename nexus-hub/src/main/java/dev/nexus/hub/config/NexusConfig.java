@@ -43,6 +43,7 @@ public class NexusConfig {
     private final int heartbeatTimeoutSeconds;
 
     private final String returnServer;
+    private final List<String> managedGames;
 
     private final List<TurretConfig> turrets;
     private final Map<String, MapPoolConfig> mapPools;
@@ -84,6 +85,7 @@ public class NexusConfig {
         heartbeatTimeoutSeconds = cfg.getInt("nexus.minion.heartbeat-timeout-seconds", 30);
 
         returnServer = cfg.getString("nexus.hub.return-server", "hub");
+        managedGames = cfg.getStringList("nexus.hub.managed-games");
 
         turrets = new ArrayList<>();
         List<?> turretList = cfg.getList("nexus.turrets");
@@ -147,6 +149,16 @@ public class NexusConfig {
     public int getHeartbeatTimeoutSeconds() { return heartbeatTimeoutSeconds; }
 
     public String getReturnServer() { return returnServer; }
+
+    /**
+     * Returns the list of game IDs this hub is configured to manage.
+     * An empty list signals that this hub manages all registered games.
+     *
+     * @return list of game ID strings; never null
+     * @since 1.0.0
+     */
+    public List<String> getManagedGames() { return managedGames; }
+
     public List<TurretConfig> getTurrets() { return turrets; }
     public Map<String, MapPoolConfig> getMapPools() { return mapPools; }
 }

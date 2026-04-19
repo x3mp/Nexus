@@ -78,7 +78,7 @@ public class NexusHubPlugin extends JavaPlugin {
         queueManager = new QueueManager(redisManager);
 
         matchmakingTask = new MatchmakingTask(
-                gameRegistry, queueManager, minionManager, redisManager, getLogger());
+                gameRegistry, queueManager, minionManager, redisManager, nexusConfig);
         long tickTicks = nexusConfig.getMatchmakingTickIntervalMs() / 50;
         matchmakingTask.runTaskTimerAsynchronously(this, tickTicks, tickTicks);
 
@@ -92,8 +92,13 @@ public class NexusHubPlugin extends JavaPlugin {
 
         NexusCommand nexusCommand = new NexusCommand(
                 queueManager, minionRegistry, minionManager, turretRegistry);
-        getCommand("nexus").setExecutor(nexusCommand);
-        getCommand("nexus").setTabCompleter(nexusCommand);
+        var nexusBukkitCommand = getCommand("nexus");
+        if (nexusBukkitCommand != null) {
+            nexusBukkitCommand.setExecutor(nexusCommand);
+            nexusBukkitCommand.setTabCompleter(nexusCommand);
+        } else {
+            getLogger().severe("Command 'nexus' not found in plugin.yml — commands will not work.");
+        }
 
         registerPlaceholders();
 

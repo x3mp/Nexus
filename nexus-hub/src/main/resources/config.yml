@@ -39,6 +39,7 @@ nexus:
 
   hub:
     return-server: "hub"
+    managed-games: []   # empty = manage ALL registered games; example: ["revenant"]
 
   map-pools:
     default:

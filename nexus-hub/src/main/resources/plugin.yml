@@ -15,6 +15,9 @@ commands:
     aliases: [ nx ]
 
 permissions:
+  nexus.status:
+    description: View queue and minion status via /nexus status
+    default: op
   nexus.admin:
     description: Access to /nexus admin subcommands
     default: op
