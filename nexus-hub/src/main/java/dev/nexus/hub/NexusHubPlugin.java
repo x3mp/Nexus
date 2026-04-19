@@ -1,6 +1,6 @@
 package dev.nexus.hub;
 
-import dev.nexus.api.game.NexusGame;
+import dev.nexus.api.NexusAPI;
 import dev.nexus.hub.command.NexusCommand;
 import dev.nexus.hub.config.NexusConfig;
 import dev.nexus.hub.game.GameRegistry;
@@ -25,9 +25,8 @@ import org.bukkit.plugin.java.JavaPlugin;
  * Main plugin class for the Nexus hub.
  *
  * <p>Wires up all components on enable and tears them down on disable.
- * Exposes a static {@link #getInstance()} so external game plugins can call
- * {@code NexusHubPlugin.getInstance().getGameRegistry().register(new MyGame())}
- * from their own {@code onEnable}.
+ * Game plugins register themselves via {@code NexusAPI.registerGame(new MyGame())}
+ * in their own {@code onEnable}; nexus-hub drains that list one tick after startup.
  *
  * @since 1.0.0
  */
@@ -102,6 +101,13 @@ public class NexusHubPlugin extends JavaPlugin {
 
         registerPlaceholders();
 
+        getServer().getScheduler().runTask(this, () -> {
+            for (dev.nexus.api.game.NexusGame game : NexusAPI.getRegisteredGames()) {
+                gameRegistry.register(game);
+            }
+            getLogger().info("Loaded " + NexusAPI.getRegisteredGames().size() + " game(s) from NexusAPI.");
+        });
+
         getLogger().info("NexusHub enabled.");
     }
 
@@ -125,18 +131,7 @@ public class NexusHubPlugin extends JavaPlugin {
         return instance;
     }
 
-    /**
-     * Convenience method for game plugins to register a gamemode.
-     *
-     * <p>Delegates to {@link GameRegistry#register(NexusGame)}.
-     *
-     * @param game the game implementation to register
-     */
-    public void registerGame(NexusGame game) {
-        gameRegistry.register(game);
-    }
-
-    /** @return the game registry holding all registered {@link NexusGame} implementations */
+    /** @return the game registry holding all registered {@link dev.nexus.api.game.NexusGame} implementations */
     public GameRegistry getGameRegistry() { return gameRegistry; }
 
     /** @return the Redis manager */
