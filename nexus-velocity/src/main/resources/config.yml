@@ -1,0 +1,8 @@
+nexus:
+  redis:
+    host: "127.0.0.1"
+    port: 6379
+    password: ""
+  hub-servers:
+    - "hub-1"
+    - "hub-2"

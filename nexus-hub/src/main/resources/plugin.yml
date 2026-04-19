@@ -1,0 +1,20 @@
+name: NexusHub
+description: Nexus distributed minigame instance manager — hub component
+version: '1.0.0-SNAPSHOT'
+main: dev.nexus.hub.NexusHubPlugin
+api-version: '1.21'
+load: STARTUP
+authors: [ hcqrv ]
+
+softdepend: [ PlaceholderAPI ]
+
+commands:
+  nexus:
+    description: Nexus queue and admin commands
+    usage: /nexus join|leave|status|admin
+    aliases: [ nx ]
+
+permissions:
+  nexus.admin:
+    description: Access to /nexus admin subcommands
+    default: op

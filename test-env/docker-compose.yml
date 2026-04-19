@@ -1,0 +1,71 @@
+services:
+
+  # Redis — shared state for all Nexus components
+  redis:
+    image: redis:latest
+    container_name: nexus-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - nexus-net
+    restart: unless-stopped
+
+  # Velocity proxy — players connect here on port 25565
+  velocity:
+    image: itzg/mc-proxy:latest
+    container_name: nexus-velocity
+    environment:
+      TYPE: VELOCITY
+    ports:
+      - "25565:25565"
+    volumes:
+      - ./velocity:/server
+    networks:
+      - nexus-net
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+  # Hub server — runs nexus-hub plugin
+  hub:
+    image: itzg/minecraft-server:latest
+    container_name: nexus-hub
+    environment:
+      TYPE: PAPER
+      VERSION: "1.21.11"
+      EULA: "TRUE"
+      ONLINE_MODE: "FALSE"
+      SERVER_PORT: "25566"
+    ports:
+      - "25566:25566"
+    volumes:
+      - ./hub:/data
+    networks:
+      - nexus-net
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+  # Turret 1 — local test turret, represents a game server host
+  turret-1:
+    image: itzg/minecraft-server:latest
+    container_name: nexus-turret-1
+    environment:
+      TYPE: PAPER
+      VERSION: "1.21.11"
+      EULA: "TRUE"
+      ONLINE_MODE: "FALSE"
+      SERVER_PORT: "25567"
+    ports:
+      - "25567:25567"
+    volumes:
+      - ./turret-1:/data
+    networks:
+      - nexus-net
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+networks:
+  nexus-net:
+    driver: bridge
